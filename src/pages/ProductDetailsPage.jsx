@@ -208,7 +208,7 @@ const ProductDetailsPage = () => {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart(productId, quantity);
+      await addToCart(product, quantity);
     } catch {
       // handled by context toast
     }
@@ -216,8 +216,8 @@ const ProductDetailsPage = () => {
 
   const handleBuyNow = async () => {
     try {
-      await addToCart(productId, quantity);
-      navigate('/checkout');
+      await addToCart(product, quantity);
+      navigate(isAuthenticated ? '/checkout' : '/login?redirect=/checkout');
     } catch {
       // handled by context toast
     }

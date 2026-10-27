@@ -32,20 +32,19 @@ const CartPage = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && items.length === 0) {
     return (
       <div className="py-16 text-center max-w-md mx-auto">
         <div className="w-16 h-16 rounded-2xl bg-forest-50 text-forest-800 flex items-center justify-center mx-auto mb-4 shadow-soft">
           <ShoppingBag className="w-8 h-8" />
         </div>
-        <h2 className="text-2xl font-bold text-forest-950 mb-2">Your Cart is Waiting</h2>
+        <h2 className="text-2xl font-bold text-forest-950 mb-2">Your Cart is Empty</h2>
         <p className="text-xs text-charcoal-muted mb-6 leading-relaxed">
-          Please log in to view items in your persistent shopping cart and continue your circular
-          journey.
+          Explore upcycled goods, refurbished tech, and circular creations to start filling your bag.
         </p>
-        <Link to="/login?redirect=/cart">
+        <Link to="/products">
           <Button variant="primary" size="md">
-            Sign In to View Cart
+            Explore Products
           </Button>
         </Link>
       </div>
@@ -303,7 +302,9 @@ const CartPage = () => {
               size="lg"
               icon={ArrowRight}
               iconPosition="right"
-              onClick={() => navigate('/checkout')}
+              onClick={() =>
+                navigate(isAuthenticated ? '/checkout' : '/login?redirect=/checkout')
+              }
               className="w-full justify-center shadow-soft"
             >
               Proceed to Checkout

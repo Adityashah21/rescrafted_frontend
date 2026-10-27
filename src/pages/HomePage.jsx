@@ -15,6 +15,8 @@ import {
 import Button from '../components/common/Button';
 import ProductGrid from '../components/products/ProductGrid';
 import { useToast } from '../contexts/ToastContext';
+import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import productService from '../services/productService';
 
 // Featured categories for the visual rail
@@ -172,12 +174,15 @@ const HomePage = () => {
   const trendingProducts =
     productData?.products?.length > 0 ? productData.products : SAMPLE_TRENDING_PRODUCTS;
 
-  const handleAddToCart = (product) => {
-    toast.success(`"${product.title}" added to your cart!`);
+  const { addToCart } = useCart();
+  const { toggleWishlist, wishlistIds = [] } = useWishlist();
+
+  const handleAddToCart = async (product) => {
+    await addToCart(product, 1);
   };
 
   const handleToggleWishlist = (product) => {
-    toast.info(`"${product.title}" saved to your wishlist.`);
+    toggleWishlist(product);
   };
 
   return (
@@ -315,6 +320,7 @@ const HomePage = () => {
           isLoading={isLoading}
           onAddToCart={handleAddToCart}
           onToggleWishlist={handleToggleWishlist}
+          wishlistIds={wishlistIds}
         />
       </section>
 

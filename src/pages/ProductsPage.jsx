@@ -16,6 +16,8 @@ import categoryService from '../services/categoryService';
 import ProductGrid from '../components/products/ProductGrid';
 import Button from '../components/common/Button';
 import { useToast } from '../contexts/ToastContext';
+import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 
 const CONDITIONS = [
   { value: 'upcycled', label: 'Upcycled Goods' },
@@ -132,12 +134,15 @@ const ProductsPage = () => {
     search,
   ].filter(Boolean).length;
 
-  const handleAddToCart = (product) => {
-    toast.success(`"${product.title}" added to cart!`);
+  const { addToCart } = useCart();
+  const { toggleWishlist, wishlistIds = [] } = useWishlist();
+
+  const handleAddToCart = async (product) => {
+    await addToCart(product, 1);
   };
 
   const handleToggleWishlist = (product) => {
-    toast.info(`"${product.title}" saved to your wishlist.`);
+    toggleWishlist(product);
   };
 
   return (
@@ -423,6 +428,7 @@ const ProductsPage = () => {
             isLoading={isLoading}
             onAddToCart={handleAddToCart}
             onToggleWishlist={handleToggleWishlist}
+            wishlistIds={wishlistIds}
             onResetFilters={clearAllFilters}
           />
 
