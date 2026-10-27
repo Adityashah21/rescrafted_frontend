@@ -66,8 +66,8 @@ const RegisterPage = () => {
       setServerError('');
       const { confirmPassword, ...registerPayload } = values;
       await registerUser(registerPayload);
-      // Navigate to OTP verification page
-      navigate(`/verify-otp?email=${encodeURIComponent(values.email)}`);
+      // Direct login and redirect to home
+      navigate('/', { replace: true });
     } catch (error) {
       setServerError(error.message || 'Registration failed.');
     }

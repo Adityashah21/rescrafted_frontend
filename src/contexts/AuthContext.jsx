@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       const result = await authService.register(userData);
       setUser(result.user);
       toast.success(
-        'Account created! Please check your email or preview console for your verification code.'
+        `Account created! Welcome to ResCrafted, ${result.user?.name || ''}!`
       );
       return result;
     } catch (error) {
