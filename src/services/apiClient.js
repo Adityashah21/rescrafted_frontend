@@ -68,15 +68,24 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const errorDetails = error.response?.data?.error?.details;
+    let detailMessage = null;
+    if (Array.isArray(errorDetails) && errorDetails.length > 0) {
+      detailMessage = errorDetails
+        .map((d) => (d.field ? `${d.field}: ${d.message}` : d.message))
+        .join(', ');
+    }
+
     const customError = {
       message:
+        detailMessage ||
         error.response?.data?.error?.message ||
         error.response?.data?.message ||
         error.message ||
         'An unexpected network error occurred.',
       code: error.response?.data?.error?.code || 'NETWORK_ERROR',
       status: error.response?.status || 500,
-      details: error.response?.data?.error?.details || null,
+      details: errorDetails || null,
     };
     return Promise.reject(customError);
   }

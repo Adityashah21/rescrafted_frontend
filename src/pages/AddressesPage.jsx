@@ -13,7 +13,7 @@ import { useToast } from '../contexts/ToastContext';
 
 const addressSchema = z.object({
   fullName: z.string().trim().min(2, 'Full name is required'),
-  phone: z.string().trim().regex(/^[0-9+ -]{10,15}$/, 'Please enter a valid phone number'),
+  phone: z.string().trim().regex(/^[0-9+ -]{8,15}$/, 'Please enter a valid phone number (at least 8 to 15 digits)'),
   addressLine1: z.string().trim().min(3, 'Address line 1 is required'),
   addressLine2: z.string().trim().optional(),
   city: z.string().trim().min(2, 'City is required'),

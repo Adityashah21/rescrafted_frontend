@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import addressService from '../services/addressService';
 import orderService from '../services/orderService';
@@ -44,6 +45,7 @@ const CheckoutPage = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
   const { cart, isLoading: isCartLoading, cartCount } = useCart();
+  const { user } = useAuth();
 
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -57,8 +59,8 @@ const CheckoutPage = () => {
 
   // Address form state for inline addition
   const [newAddress, setNewAddress] = useState({
-    fullName: '',
-    phone: '',
+    fullName: user?.name || '',
+    phone: user?.phone || '',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -67,6 +69,15 @@ const CheckoutPage = () => {
     country: 'India',
     isDefault: false,
   });
+
+  const handleOpenAddressModal = () => {
+    setNewAddress((prev) => ({
+      ...prev,
+      fullName: prev.fullName || user?.name || '',
+      phone: prev.phone || user?.phone || '',
+    }));
+    setIsAddressModalOpen(true);
+  };
 
   // Query saved addresses
   const {
@@ -248,11 +259,30 @@ const CheckoutPage = () => {
 
   const handleAddAddressSubmit = (e) => {
     e.preventDefault();
-    if (!newAddress.fullName || !newAddress.phone || !newAddress.addressLine1 || !newAddress.city || !newAddress.postalCode) {
+    const payload = {
+      ...newAddress,
+      fullName: (newAddress.fullName || user?.name || '').trim(),
+      phone: (newAddress.phone || '').trim(),
+      addressLine1: (newAddress.addressLine1 || '').trim(),
+      city: (newAddress.city || '').trim(),
+      state: (newAddress.state || '').trim(),
+      postalCode: (newAddress.postalCode || '').trim(),
+    };
+
+    if (!payload.fullName) {
+      toast.error('Please enter recipient full name');
+      return;
+    }
+    const digitCount = payload.phone.replace(/[^0-9]/g, '').length;
+    if (digitCount < 8 || digitCount > 15) {
+      toast.error('Please enter a valid mobile number (e.g. 10 digits)');
+      return;
+    }
+    if (!payload.addressLine1 || !payload.city || !payload.state || !payload.postalCode) {
       toast.error('Please fill in all required address fields');
       return;
     }
-    addAddressMutation.mutate(newAddress);
+    addAddressMutation.mutate(payload);
   };
 
   if (isCartLoading || isAddressesLoading) {
@@ -331,7 +361,7 @@ const CheckoutPage = () => {
                 variant="outline"
                 size="sm"
                 icon={Plus}
-                onClick={() => setIsAddressModalOpen(true)}
+                onClick={handleOpenAddressModal}
               >
                 Add New Address
               </Button>
@@ -350,7 +380,7 @@ const CheckoutPage = () => {
                   variant="primary"
                   size="sm"
                   icon={Plus}
-                  onClick={() => setIsAddressModalOpen(true)}
+                  onClick={handleOpenAddressModal}
                 >
                   Add Shipping Address
                 </Button>
